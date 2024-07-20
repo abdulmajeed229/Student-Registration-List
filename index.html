@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+
+        main {
+            height: 100vh;
+            width: 100%;
+        }
+
+        header {
+            height: 100px;
+            width: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type='text'] {
+            height: 35px;
+            width: 280px;
+            padding-left: 10px;
+            outline: none;
+            border: none;
+            border-bottom: 1px solid rgb(219, 216, 216);
+        }
+
+        button {
+            height: 35px;
+            width: 120px;
+            background-color: transparent;
+            border: 1px solid rgb(216, 211, 211);
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: rgb(148, 148, 197);
+            color: white;
+        }
+
+        .box {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            border: 1px solid rgb(224, 221, 221);
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid rgb(231, 230, 230);
+            height: 40px;
+            text-align: center;
+            padding: 5px;
+        }
+
+        #del {
+            height: 35px;
+            width: 90px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <header>
+            <input type="text" placeholder="Enter Name" id="name">
+            <input type="text" placeholder="Enter Father Name" id="fatherName">
+            <input type="text" placeholder="Enter Email" id="email">
+            <input type="text" placeholder="Enter Number" id="numb">
+
+            <button id="btn">Add Student</button>
+        </header>
+
+        <div class="box">
+            <table id="myTable">
+                <thead>
+                    <tr>
+                        <th>S-N</th>
+                        <th>Name</th>
+                        <th>Father Name</th>
+                        <th>Email</th>
+                        <th>Number</th>
+                        <th>Roll Number</th>
+                        <th>Delete</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        let sNO = 1;
+        let myTable = document.getElementById('myTable');
+        let btn = document.getElementById('btn');
+
+        // Load data from local storage on page load
+        window.onload = function () {
+            let storedStudents = JSON.parse(localStorage.getItem('students'));
+            if (storedStudents) {
+                storedStudents.forEach(student => addStudentRow(student));
+            }
+        };
+
+        btn.onclick = function () {
+            let userName = document.getElementById('name').value;
+            let userFather = document.getElementById('fatherName').value;
+            let userEmail = document.getElementById('email').value;
+            let userNumb = document.getElementById('numb').value;
+            let rolRandom = Math.round(Math.random() * (999999 - 100000 + 1) + 100000);
+
+            let student = {
+                sNO: sNO++,
+                name: userName,
+                fatherName: userFather,
+                email: userEmail,
+                number: userNumb,
+                rollNumber: rolRandom
+            };
+
+            addStudentRow(student);
+
+           
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            students.push(student);
+            localStorage.setItem('students', JSON.stringify(students));
+
+           
+            document.getElementById('name').value = '';
+            document.getElementById('fatherName').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('numb').value = '';
+        };
+
+        function addStudentRow(student) {
+            let newRow = myTable.insertRow();
+            let cell1 = newRow.insertCell();
+            let cell2 = newRow.insertCell();
+            let cell3 = newRow.insertCell();
+            let cell4 = newRow.insertCell();
+            let cell5 = newRow.insertCell();
+            let cell6 = newRow.insertCell();
+            let cell7 = newRow.insertCell();
+            let cell8 = newRow.insertCell();
+
+            cell1.textContent = student.sNO;
+            cell2.textContent = student.name;
+            cell3.textContent = student.fatherName;
+            cell4.textContent = student.email;
+            cell5.textContent = student.number;
+            cell6.textContent = student.rollNumber;
+            cell7.innerHTML = '<button onclick="deleteRow(this)">Delete</button>';
+            cell8.innerHTML = '<button onclick="editRow(this)">Edit</button>';
+        }
+
+        function deleteRow(button) {
+            let row = button.closest('tr');
+            let index = row.rowIndex - 1;
+            row.remove();
+
+            // Remove student from local storage
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            students.splice(index, 1);
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+
+        function editRow(button) {
+            let row = button.closest('tr');
+            let cells = row.cells;
+            let index = row.rowIndex - 1;
+
+            let currentName = cells[1].textContent;
+            let currentFatherName = cells[2].textContent;
+            let currentEmail = cells[3].textContent;
+            let currentNumber = cells[4].textContent;
+
+            let newName = prompt("Enter new Name:", currentName);
+            if (newName !== null) {
+                cells[1].textContent = newName;
+            }
+
+            let newFatherName = prompt("Enter new Father Name:", currentFatherName);
+            if (newFatherName !== null) {
+                cells[2].textContent = newFatherName;
+            }
+
+            let newEmail = prompt("Enter new Email:", currentEmail);
+            if (newEmail !== null) {
+                cells[3].textContent = newEmail;
+            }
+
+            let newNumber = prompt("Enter new Number:", currentNumber);
+            if (newNumber !== null) {
+                cells[4].textContent = newNumber;
+            }
+
+           
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            students[index].name = cells[1].textContent;
+            students[index].fatherName = cells[2].textContent;
+            students[index].email = cells[3].textContent;
+            students[index].number = cells[4].textContent;
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+    </script>
+</body>
+
+</html>
